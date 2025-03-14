@@ -1,0 +1,232 @@
+/* 主要颜色变量 */
+:root {
+  --primary-color: #1E4584; /* 深蓝色 - 主色调 */
+  --primary-light: #2A5AA0; /* 浅蓝色 - 主色调亮色版 */
+  --accent-color: #FF6B35; /* 橙色 - 强调色 */
+  --accent-light: #FF8A5C; /* 浅橙色 - 强调色亮色版 */
+  --success-color: #28A745; /* 绿色 - 成功状态 */
+  --warning-color: #FFC107; /* 黄色 - 警告状态 */
+  --danger-color: #DC3545; /* 红色 - 危险状态 */
+  --text-dark: #333333; /* 深灰色 - 主要文本 */
+  --text-light: #666666; /* 灰色 - 次要文本 */
+  --bg-light: #F5F7FA; /* 浅灰色 - 背景色 */
+  --bg-white: #FFFFFF; /* 白色 - 组件背景 */
+  --border-color: #E4E7ED; /* 边框颜色 */
+}
+
+/* 应用主色调到Tailwind类 */
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-primary-light {
+  background-color: var(--primary-light);
+}
+
+.bg-accent {
+  background-color: var(--accent-color);
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-accent {
+  color: var(--accent-color);
+}
+
+.border-primary {
+  border-color: var(--primary-color);
+}
+
+/* 通用样式 */
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--primary-light);
+}
+
+/* 自定义卡片样式 */
+.custom-card {
+  background-color: var(--bg-white);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* 数据仪表盘卡片 */
+.stat-card {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--bg-white);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.stat-card .stat-label {
+  color: var(--text-light);
+  font-size: 0.875rem;
+}
+
+/* 自定义按钮 */
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-light);
+}
+
+.btn-accent {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-accent:hover {
+  background-color: var(--accent-light);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .stat-card .stat-value {
+    font-size: 1.5rem;
+  }
+}
+
+/* 自定义Element Plus组件样式 */
+.el-button--primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.el-button--primary:hover,
+.el-button--primary:focus {
+  background-color: var(--primary-light) !important;
+  border-color: var(--primary-light) !important;
+}
+
+/* 视频分析区域样式 */
+.video-analysis-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+.video-player {
+  width: 100%;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.analysis-sidebar {
+  background-color: var(--bg-white);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 训练计划时间线 */
+.timeline-container {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  top: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  z-index: 1;
+}
+
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 1.5rem;
+  width: 2px;
+  height: calc(100% - 1rem);
+  background-color: var(--border-color);
+}
+
+.timeline-item:last-child::after {
+  display: none;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-up {
+  animation: slideUp 0.5s ease-in-out;
+} 

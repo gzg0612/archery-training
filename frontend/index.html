@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能射箭训练系统</title>
+  <!-- 引入Element Plus样式 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus@2.4.1/dist/index.css">
+  <!-- 引入Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- 引入自定义样式 -->
+  <link rel="stylesheet" href="./css/main.css">
+  <!-- 页面图标 -->
+  <link rel="icon" href="./assets/images/logo.png" type="image/png">
+</head>
+<body class="bg-gray-50">
+  <div id="app">
+    <!-- 应用加载状态 -->
+    <div v-if="loading" class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-80 z-50">
+      <div class="text-center">
+        <el-icon class="animate-spin text-blue-600 text-4xl mb-2"><loading /></el-icon>
+        <p class="text-gray-600">加载中...</p>
+      </div>
+    </div>
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-primary shadow-md">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <img src="./assets/images/logo.png" alt="智能射箭训练系统" class="h-10 w-auto mr-2">
+            <h1 class="text-white text-xl font-bold">智能射箭训练系统</h1>
+          </div>
+          <div v-if="isLoggedIn">
+            <nav class="flex space-x-6">
+              <a href="#dashboard" class="text-white hover:text-blue-200 px-2 py-1 rounded transition" :class="{'bg-blue-700': currentPage === 'dashboard'}">首页</a>
+              <a href="#training" class="text-white hover:text-blue-200 px-2 py-1 rounded transition" :class="{'bg-blue-700': currentPage === 'training'}">训练计划</a>
+              <a href="#analysis" class="text-white hover:text-blue-200 px-2 py-1 rounded transition" :class="{'bg-blue-700': currentPage === 'analysis'}">视频分析</a>
+              <a href="#profile" class="text-white hover:text-blue-200 px-2 py-1 rounded transition" :class="{'bg-blue-700': currentPage === 'profile'}">个人中心</a>
+            </nav>
+          </div>
+          <div v-if="isLoggedIn" class="flex items-center">
+            <el-dropdown>
+              <span class="flex items-center text-white cursor-pointer">
+                <img :src="userAvatar" alt="用户头像" class="h-8 w-8 rounded-full mr-2">
+                {{ userName }}
+                <el-icon class="ml-1"><arrow-down /></el-icon>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="goToProfile">个人资料</el-dropdown-item>
+                  <el-dropdown-item @click="goToSettings">系统设置</el-dropdown-item>
+                  <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="container mx-auto px-4 py-6">
+      <!-- 登录/注册页面 -->
+      <div v-if="!isLoggedIn" class="flex justify-center items-center min-h-[80vh]">
+        <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+          <div class="text-center mb-6">
+            <img src="./assets/images/logo.png" alt="智能射箭训练系统" class="h-16 w-auto mx-auto mb-2">
+            <h2 class="text-2xl font-bold text-gray-800">智能射箭训练系统</h2>
+            <p class="text-gray-600">专业的射箭训练分析平台</p>
+          </div>
+
+          <el-tabs v-model="activeTab" class="mb-4">
+            <el-tab-pane label="登录" name="login">
+              <el-form :model="loginForm" @submit.prevent="handleLogin">
+                <el-form-item>
+                  <el-input v-model="loginForm.username" placeholder="用户名/邮箱" prefix-icon="User"></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-input v-model="loginForm.password" type="password" placeholder="密码" prefix-icon="Lock" show-password></el-input>
+                </el-form-item>
+                <div class="flex justify-between items-center mb-4">
+                  <el-checkbox v-model="loginForm.remember">记住我</el-checkbox>
+                  <a href="#" class="text-blue-600 text-sm hover:underline">忘记密码?</a>
+                </div>
+                <el-button type="primary" class="w-full" @click="handleLogin">登录</el-button>
+              </el-form>
+            </el-tab-pane>
+            <el-tab-pane label="注册" name="register">
+              <el-form :model="registerForm" @submit.prevent="handleRegister">
+                <el-form-item>
+                  <el-input v-model="registerForm.username" placeholder="用户名" prefix-icon="User"></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-input v-model="registerForm.email" placeholder="邮箱" prefix-icon="Message"></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-input v-model="registerForm.password" type="password" placeholder="密码" prefix-icon="Lock" show-password></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-input v-model="registerForm.confirmPassword" type="password" placeholder="确认密码" prefix-icon="Lock" show-password></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-checkbox v-model="registerForm.agreement">我已阅读并同意<a href="#" class="text-blue-600 hover:underline">使用条款</a>和<a href="#" class="text-blue-600 hover:underline">隐私政策</a></el-checkbox>
+                </el-form-item>
+                <el-button type="primary" class="w-full" @click="handleRegister">注册</el-button>
+              </el-form>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </div>
+
+      <!-- 已登录后的内容区域 - 根据当前页面显示不同内容 -->
+      <div v-else>
+        <component :is="currentComponent"></component>
+      </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-6">
+      <div class="container mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="mb-4 md:mb-0">
+            <p>&copy; 2023 智能射箭训练系统 版权所有</p>
+          </div>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-400 hover:text-white">关于我们</a>
+            <a href="#" class="text-gray-400 hover:text-white">使用条款</a>
+            <a href="#" class="text-gray-400 hover:text-white">隐私政策</a>
+            <a href="#" class="text-gray-400 hover:text-white">帮助中心</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 引入Vue 3 -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3.3.7/dist/vue.global.js"></script>
+  <!-- 引入Element Plus -->
+  <script src="https://cdn.jsdelivr.net/npm/element-plus@2.4.1/dist/index.full.min.js"></script>
+  <!-- 引入Element Plus图标 -->
+  <script src="https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.1.0/dist/index.iife.min.js"></script>
+  <!-- 引入页面组件 -->
+  <script src="./components/Dashboard.js"></script>
+  <script src="./components/Training.js"></script>
+  <script src="./components/Analysis.js"></script>
+  <script src="./components/Profile.js"></script>
+  <!-- 引入主应用脚本 -->
+  <script src="./js/main.js"></script>
+</body>
+</html> 

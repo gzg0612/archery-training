@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # PostgreSQL数据库
+  postgres:
+    image: postgres:15-alpine
+    container_name: archery-postgres
+    environment:
+      POSTGRES_DB: archery
+      POSTGRES_USER: archery
+      POSTGRES_PASSWORD: archery_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - archery-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U archery"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: archery-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - archery-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO对象存储
+  minio:
+    image: minio/minio
+    container_name: archery-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - archery-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # API服务
+  api:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/api/Dockerfile.dev
+    container_name: archery-api
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=archery
+      - DB_PASSWORD=archery_password
+      - DB_NAME=archery
+      - REDIS_HOST=redis
+      - MINIO_HOST=minio
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - GIN_MODE=debug
+    volumes:
+      - ../../:/app
+    networks:
+      - archery-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+  # AI服务
+  ai-service:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/ai/Dockerfile.dev
+    container_name: archery-ai
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=archery
+      - DB_PASSWORD=archery_password
+      - DB_NAME=archery
+      - MINIO_HOST=minio
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    volumes:
+      - ../../ai-service:/app
+    networks:
+      - archery-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+networks:
+  archery-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data: 
