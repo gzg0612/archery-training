@@ -103,7 +103,7 @@ archery-training/
 ### 本地开发环境
 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/archery-training.git
+git clone https://github.com/gzg0612/archery-training.git
 cd archery-training
 ```
 
